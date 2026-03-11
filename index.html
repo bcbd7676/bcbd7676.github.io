@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ArkASeeker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #c9a84c;
+      --gold-light: #e8c96a;
+      --deep: #0a0806;
+      --surface: #12100d;
+      --text: #d4c9b0;
+      --muted: #6b6050;
+    }
+
+    body {
+      background: var(--deep);
+      color: var(--text);
+      font-family: 'Crimson Pro', Georgia, serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Starfield */
+    canvas#stars {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Radial vignette */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 40%, transparent 30%, rgba(0,0,0,0.85) 100%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    main {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 2rem;
+      max-width: 640px;
+    }
+
+    .glyph {
+      font-size: clamp(2rem, 8vw, 5.5rem);
+      white-space: nowrap;
+      overflow: visible;
+      line-height: 1;
+      letter-spacing: 0.06em;
+      font-family: 'Cinzel Decorative', serif;
+      background: linear-gradient(160deg, var(--gold-light) 0%, var(--gold) 50%, #8a6520 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 4s ease-in-out infinite alternate;
+      filter: drop-shadow(0 0 32px rgba(201,168,76,0.25));
+    }
+
+    @keyframes shimmer {
+      from { filter: drop-shadow(0 0 20px rgba(201,168,76,0.2)); }
+      to   { filter: drop-shadow(0 0 48px rgba(201,168,76,0.45)); }
+    }
+
+    .divider {
+      width: 180px;
+      height: 1px;
+      margin: 1.8rem auto;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+      opacity: 0.6;
+    }
+
+    .tagline {
+      font-size: clamp(1rem, 3vw, 1.25rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--text);
+      opacity: 0.75;
+      letter-spacing: 0.08em;
+    }
+
+    .links {
+      margin-top: 2.8rem;
+      display: flex;
+      gap: 1.4rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .links a {
+      font-family: 'Crimson Pro', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: color 0.3s, border-color 0.3s;
+    }
+
+    .links a:hover {
+      color: var(--gold-light);
+      border-color: var(--gold-light);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="stars"></canvas>
+  <main>
+    <div class="glyph">ArkASeeker</div>
+    <div class="divider"></div>
+    <p class="tagline">Seek what is hidden. Claim what endures.</p>
+    <nav class="links">
+      <a href="/legal/license.html">License</a>
+      <a href="/legal/copyright.html">Copyright</a>
+      <a href="/legal/privacy-policy.html">Privacy Policy</a>
+    </nav>
+  </main>
+
+  <script>
+    const c = document.getElementById('stars');
+    const ctx = c.getContext('2d');
+    let W, H, stars = [];
+
+    function resize() {
+      W = c.width = window.innerWidth;
+      H = c.height = window.innerHeight;
+    }
+
+    function init() {
+      resize();
+      stars = Array.from({ length: 160 }, () => ({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 1.2 + 0.2,
+        a: Math.random(),
+        speed: Math.random() * 0.004 + 0.002,
+        phase: Math.random() * Math.PI * 2
+      }));
+    }
+
+    function draw(t) {
+      ctx.clearRect(0, 0, W, H);
+      for (const s of stars) {
+        s.a = 0.3 + 0.5 * Math.abs(Math.sin(t * s.speed + s.phase));
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(210,195,160,${s.a})`;
+        ctx.fill();
+      }
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', init);
+    init();
+    requestAnimationFrame(draw);
+  </script>
+</body>
+</html>
